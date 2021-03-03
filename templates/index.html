@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>python期末项目之预测房价</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+</head>
+<body>
+
+<div class="row" style="margin-top: 5%" >
+    <div class="col-md-1"></div>
+    <div class="col-md-1">
+        <label>ZN:住宅用地超过25000英尺的比例</label>
+        <input type="text" class="form-control" placeholder="住宅用地" name="zn">
+    </div>
+    <div class="col-md-1"></div>
+    <div class="col-md-1">
+        <label>RM:住宅平均房间数</label>
+        <input type="text" class="form-control" placeholder="平均房间数" name="rm">
+    </div>
+    <div class="col-md-1"></div>
+    <div class="col-md-1">
+        <label>DIS:到波士顿五个中心区域的加权距离</label>
+        <input type="text" class="form-control" placeholder="距中心区域距离" name="dis">
+    </div>
+    <div class="col-md-1"></div>
+    <div class="col-md-1">
+        <label>PTRATIO:城镇师生比例</label>
+        <input type="text" class="form-control" placeholder="师生比例" name="ptratio">
+    </div>
+    <div class="col-md-1"></div>
+    <div class="col-md-1">
+        <label>LSTAT:人口中地位低下者的比例</label>
+        <input type="text" class="form-control" placeholder="地位低下者比例" name="lstat">
+    </div>
+    <div class="col-md-1"></div>
+    <div class="col-md-1">
+        <button class="btn btn-primary" style="margin-top: 30px" onclick="predictSubmit()">Predict</button>
+    </div>
+</div>
+
+<div class="form-row">
+    <div class="col-md-2"></div>
+    <div id="predict" class="col-md-8" style="width: 600px;height:800px;"></div>
+    <div class="col-md-2"></div>
+</div>
+
+<script src="{{ url_for('static', filename='echarts/dist/echarts.min.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+<script type="text/javascript">
+    function renderChart(predict_value) {
+        echarts.init(document.getElementById('predict')).dispose();
+        var eChart = echarts.init(document.getElementById('predict'));
+        var option = {
+            series: [
+                {
+                    name: '波士顿房价预测',
+                    type: 'pie',
+                    radius: '60%',
+                    data: [
+                        {value: predict_value, itemStyle: {color: '#D8BFD8'}},
+                    ],
+                    label: {
+                        normal: {
+                          position: 'center',
+                          formatter: '波士顿房价预测结果\n\n' + '{c}' + "\n\n千美元",
+                          fontSize: 24,
+                        }
+                    },
+                }
+            ]
+        };
+        eChart.setOption(option);
+    }
+
+    function predictSubmit() {
+        $.ajax({
+                url: "/predict",
+                data: {
+                    "zn": $("input[name='zn']").val(),
+                    "rm": $("input[name='rm']").val(),
+                    "dis": $("input[name='dis']").val(),
+                    "ptratio": $("input[name='ptratio']").val(),
+                    "lstat": $("input[name='lstat']").val(),
+                },
+                type: "POST",
+                dataType: "json",
+                success: function(data) {
+                    renderChart(data.predict);
+                }
+            });
+    }
+</script>
+</body>
+</html>
