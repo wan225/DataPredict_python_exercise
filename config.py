@@ -2,7 +2,6 @@
 # @Time  : 2021/2/24 5:30 PM
 # @Author : wan
 
-
 # 数据库配置
 HOST = 'localhost'
 PORT = '3306'
